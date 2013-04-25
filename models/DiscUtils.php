@@ -49,8 +49,10 @@ class DiscUtils {
                 . $tableInfo . ' on ' . $tableFiles
                 . '.pid=' 
                 . $tableInfo . '.pid and ' . $tableFiles . '.photo_id='
-                . $tableInfo . '.photo_id';
+                . $tableInfo . '.photo_id and '
+                . $tableInfo . '.eye=\'' . $eye . '\'';
         $exam_criteria->distinct = true;
+        $exam_criteria->group = $tableFiles . ".photo_id";
         $exam_criteria->condition = $tableInfo . '.pid=\''
                 . $patient->hos_num . '\' and '
                 . $tableInfo . '.eye=\'' . $eye . '\'';
