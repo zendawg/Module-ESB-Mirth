@@ -60,7 +60,37 @@ class VfaUtils {
         $exam_criteria->condition = 'pid=\''
                 . $patient->hos_num . '\' and '
                 . 'eye=\'' . $eye . '\'';
+        $x = $exam_criteria->condition;
         $data = VfaInfo::model()->findAll($exam_criteria);
+        return $data;
+    }
+
+    /**
+     * Get the list of files associated with the specified patient.
+     * 
+     * @param Patient $patient the patient under scrutiny.
+     * 
+     * @param char $side which eye to select files from, one of 'L' or 'R'.
+     * 
+     * @return the list of files, if there are any; otherwise, the empty list
+     * is returned.
+     */
+    public static function getVfaFile($patient, $asset_id, $eye = 'L') {
+        $x = $patient->hos_num;
+        $exam_criteria = new CDbCriteria;
+        $exam_criteria->condition = ServiceBusFile::model()->tableName() . '.asset_id=' . $asset_id;
+        $exam_criteria->join = 
+                ' left join ' . ServiceBusFile::model()->tableName()
+                . ' on ' . 'asset_id=' . ServiceBusFile::model()->tableName()
+                . '.asset_id'
+                ;
+        try {
+        $x = $exam_criteria->join;
+        $y = $exam_criteria->condition;
+            $data = VfaFiles::model()->find($exam_criteria);
+        } catch(Exception $e) {
+            $foo = $e;
+        }
         return $data;
     }
 
@@ -98,12 +128,11 @@ class VfaUtils {
      * @return type a string containinf the full (YII) path to the image
      * file and patient number after encoding using MD5 hash.
      */
-    public static function getEncodedDiscFileName($hosNum, $original_filename) {
+    public static function getEncodedDiscFileName($hosNum) {
         return
                 // first part - actual file image location
                 self::IMAGE_GALLERY
-                . VfaUtils::getUid($hosNum) . '-' . md5($hosNum)
-                . "/thumbs/" . md5($original_filename) . self::VFA_THUMB_IMAGE_EXT;
+                . VfaUtils::getUid($hosNum);// . '-' . md5($hosNum);
     }
     
     /**

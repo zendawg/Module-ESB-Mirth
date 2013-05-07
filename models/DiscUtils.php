@@ -60,6 +60,40 @@ class DiscUtils {
         return array();
     }
     
+    /**
+     * Get the list of files associated with the specified patient.
+     * 
+     * @param Patient $patient the patient under scrutiny.
+     * 
+     * @param char $side which eye to select files from, one of 'L' or 'R'.
+     * 
+     * @return the list of files, if there are any; otherwise, the empty list
+     * is returned.
+     */
+    public static function getDiscFile($patient, $asset_id, $eye = 'L') {
+        $tableInfo = DiscInfo::model()->tableName();
+        $tableFiles = DiscFiles::model()->tableName();
+        $exam_criteria = new CDbCriteria;
+        $exam_criteria->alias = $tableFiles;
+//        $exam_criteria->select = $tableFiles . '.file_id';
+        $exam_criteria->join = 'left join '
+                . $tableInfo . ' on ' . $tableFiles
+                . '.pid=' 
+                . $tableInfo . '.pid and ' . $tableFiles . '.photo_id='
+                . $tableInfo . '.photo_id and '
+                . $tableInfo . '.eye=\'' . $eye . '\''
+                . ' left join ' . ServiceBusFile::model()->tableName()
+                . ' on ' . $tableFiles . '.file_id=' . ServiceBusFile::model()->tableName()
+                . '.id';
+        $exam_criteria->distinct = true;
+        $exam_criteria->group = $tableFiles . ".photo_id";
+        $exam_criteria->condition = $tableInfo . '.pid=\''
+                . $patient->hos_num . '\' and '
+                . $tableInfo . '.eye=\'' . $eye . '\' and '
+                . ServiceBusFile::model()->tableName() . '.asset_id=' . $asset_id;
+        return DiscFiles::model()->find($exam_criteria);
+    }
+    
 
     /**
      * Get the text for displaying the thumbnail links for the specified
@@ -96,12 +130,11 @@ class DiscUtils {
      * @return type a string containinf the full (YII) path to the image
      * file and patient number after encoding using MD5 hash.
      */
-    public static function getEncodedDiscFileName($hos_num, $original_filename) {
+    public static function getEncodedDiscFileName($hos_num) {
         return
                 // first part - actual file image location
                 self::IMAGE_GALLERY
-                . DiscUtils::getUid($hos_num) . '-' . md5($hos_num)
-                . "/thumbs/" . md5($original_filename) . self::STEREO_IMAGE_EXT;
+                . DiscUtils::getUid($hos_num);// . '-' . md5($hos_num);
     }
     
     /**

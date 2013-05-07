@@ -2,7 +2,7 @@
 
 /**
  * OpenEyes
- *
+ 
  * (C) OpenEyes Foundation, 2011-2012
  * This file is part of OpenEyes.
  * OpenEyes is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -19,13 +19,16 @@
 <?php
 
 /**
- * All service bus types contain a key to the file table.
+ * This is the model class for stereo disc files deposited after an
+ * examination (for example, Kowa camera).
  *
+ * The followings are the available columns:
+ * 
  * The followings are the available model relations:
  * 
- * @property ServiceBusDirectory $directory
+ * @property ServiceBusFile $file
  */
-class ServiceBusFile extends BaseEventTypeElement {
+class PatientUid extends BaseEventTypeElement {
 
     /**
      * Returns the static model of the specified AR class.
@@ -39,7 +42,7 @@ class ServiceBusFile extends BaseEventTypeElement {
      * @return string the associated database table name
      */
     public function tableName() {
-        return 'mod_servicebus_file';
+        return 'mod_servicebus_uid';
     }
 
     /**
@@ -59,8 +62,7 @@ class ServiceBusFile extends BaseEventTypeElement {
         // NOTE: you may need to adjust the relation name and the related
         // class name for the relations automatically generated below.
         return array(
-            'directory' => array(self::BELONGS_TO, 'ServiceBusDirectory', 'dir_id'),
-            'asset' => array(self::BELONGS_TO, 'Asset', 'asset_id')
+            'patient' => array(self::BELONGS_TO, 'patient', 'hos_num')
         );
     }
 
@@ -83,11 +85,6 @@ class ServiceBusFile extends BaseEventTypeElement {
         $criteria = new CDbCriteria;
 
         $criteria->compare('id', $this->id, true);
-        $criteria->compare('name', $this->name, false);
-        $criteria->compare('modified', $this->modified, false);
-        $criteria->compare('length', $this->length, false);
-        $criteria->compare('chronological_key', $this->length, false);
-        $criteria->compare('dir_id', $this->length, false);
 
         return new CActiveDataProvider(get_class($this), array(
                     'criteria' => $criteria,

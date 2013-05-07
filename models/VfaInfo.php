@@ -60,7 +60,7 @@ class VfaInfo extends BaseEventTypeElement {
         // NOTE: you may need to adjust the relation name and the related
         // class name for the relations automatically generated below.
         return array(
-            'vfa_file' => array(self::BELONGS_TO, 'VfaFiles', 'file_name'),
+            'vfa_file' => array(self::BELONGS_TO, 'VfaFiles', 'tif_file_id'),
             'file' => array(self::BELONGS_TO, 'ServiceBusFile', 'file_id')
         );
     }
